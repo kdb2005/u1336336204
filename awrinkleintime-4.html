@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Drive - Evidence Archive</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    margin: 0;
+    background: #17191b;
+    color: white;
+    font-family: 'Inter', Arial, sans-serif;
+}
+.archive-section {
+    min-height: 100vh;
+    padding: 50px 20px 80px;
+}
+.archive-container { max-width: 1000px; margin: auto; }
+.archive-header {
+    border-bottom: 1px solid #444;
+    padding-bottom: 25px;
+    margin-bottom: 30px;
+}
+.archive-header small {
+    color: #888;
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+.archive-header h1 {
+    font-size: 38px;
+    font-weight: 500;
+    margin: 10px 0;
+}
+.archive-header p {
+    color: #aaa;
+    max-width: 650px;
+    line-height: 1.6;
+    font-size: 14px;
+}
+.folder-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+.folder {
+    background: #222527;
+    border: 1px solid #3b3e40;
+    border-radius: 10px;
+    padding: 25px 20px;
+    cursor: pointer;
+    transition: background .2s, border-color .2s,
+                transform .2s, box-shadow .2s;
+}
+.folder:hover {
+    background: #2c2f31;
+    border-color: #666;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 14px #0003;
+}
+.folder:active { transform: translateY(0); }
+.folder:focus-visible { outline: 2px solid #aaa; outline-offset: 3px; }
+.folder h3 { font-size: 15px; margin: 0 0 7px; font-weight: 600; }
+.folder p { color: #999; font-size: 12px; line-height: 1.5; margin: 0; }
+.folder.father { border-color: #888; }
+.folder.father:hover { border-color: #ddd; }
+
+.archive-next {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    gap: 15px;
+}
+.next-button {
+    display: inline-block;
+    padding: 12px 22px;
+    background: white;
+    color: #17191b;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 13px;
+    transition: background .2s;
+}
+.next-button:hover { background: #ccc; }
+
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    inset: 0;
+    background: #000c;
+    padding: 25px;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    backdrop-filter: blur(3px);
+}
+.popup.show { display: flex; animation: overlayFade .25s ease both; }
+.popup-box {
+    background: #f5f5f5;
+    color: #25282b;
+    width: 100%;
+    max-width: 550px;
+    padding: 35px;
+    position: relative;
+    border: 1px solid #ffffff80;
+    border-radius: 14px;
+    box-shadow: 0 15px 45px #0005;
+    animation: popupEnter .35s ease both;
+}
+.popup-box h2 { margin: 12px 0 15px; font-weight: 500; font-size: 25px; }
+.popup-box p { line-height: 1.7; font-size: 14px; color: #555; margin-bottom: 0; }
+.popup-tag { font-size: 10px; letter-spacing: 1.5px; color: #777; }
+.close-button {
+    position: absolute;
+    right: 15px;
+    top: 12px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    background: transparent;
+    color: #555;
+    font-size: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.close-button:hover { background: #e3e3e3; }
+
+.slideshow-box {
+    width: 95%;
+    max-width: 950px;
+    height: 90vh;
+    max-height: 850px;
+    background: #111;
+    color: white;
+    padding: 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #444;
+    border-radius: 14px;
+    overflow: hidden;
+    animation: popupEnter .35s ease both;
+}
+.slideshow-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    gap: 15px;
+}
+.slideshow-header h2 { font-size: 13px; font-weight: 500; margin: 0; }
+.slide-counter { color: #888; font-size: 12px; white-space: nowrap; }
+.slide-image-area {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background: #050505;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.slide-image-area img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.slide-instruction { text-align: center; padding: 12px 5px 2px; color: #888; font-size: 11px; }
+.close-slide {
+    width: 30px;
+    height: 30px;
+    margin-left: 8px;
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.close-slide:hover { background: #333; }
+
+@keyframes overlayFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popupEnter {
+    from { opacity: 0; transform: translateY(18px) scale(.94); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 750px) {
+    .folder-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .folder { padding: 20px; }
+    .slideshow-box { width: 100%; height: 80vh; padding: 15px; }
+}
+@media (max-width: 500px) {
+    .archive-section { padding: 35px 18px 60px; }
+    .archive-header h1 { font-size: 32px; }
+    .folder-grid { grid-template-columns: 1fr; }
+    .popup { padding: 16px; }
+    .popup-box { padding: 30px 22px; }
+    .popup-box h2 { font-size: 22px; }
+    .slideshow-box { height: 75vh; padding: 12px; }
+    .slideshow-header h2 { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
+</style>
+</head>
+
+<body>
+<section class="archive-section">
+<div class="archive-container">
+    <div class="archive-header">
+        <small>RECOVERED ARCHIVE</small>
+        <h1>The Drive</h1>
+        <p>Files recovered from outside the Mzanzi Connect system. Some information appears to have been removed from public records.</p>
+    </div>
+
+    <div class="folder-grid">
+        <div class="folder" role="button" tabindex="0" onclick="openPopup('photos')" onkeydown="folderKey(event,'photos')">
+            <h3>PHOTOGRAPHS</h3>
+            <p>Personal and community photographs.</p>
+        </div>
+
+        <div class="folder" role="button" tabindex="0" onclick="openPopup('music')" onkeydown="folderKey(event,'music')">
+            <h3>MUSIC</h3>
+            <p>Removed recordings and music archives.</p>
+        </div>
+
+        <div class="folder" role="button" tabindex="0" onclick="openPopup('history')" onkeydown="folderKey(event,'history')">
+            <h3>HISTORY</h3>
+            <p>Records of events and forgotten histories.</p>
+        </div>
+
+        <div class="folder" role="button" tabindex="0" onclick="openPopup('ancestry')" onkeydown="folderKey(event,'ancestry')">
+            <h3>ANCESTRY</h3>
+            <p>Family histories and community records.</p>
+        </div>
+
+        <div class="folder" role="button" tabindex="0" onclick="openPopup('knowledge')" onkeydown="folderKey(event,'knowledge')">
+            <h3>KNOWLEDGE</h3>
+            <p>Indigenous knowledge and research.</p>
+        </div>
+
+        <div class="folder" role="button" tabindex="0" onclick="openPopup('language')" onkeydown="folderKey(event,'language')">
+            <h3>LANGUAGE</h3>
+            <p>Language records removed from education.</p>
+        </div>
+
+        <div class="folder father" role="button" tabindex="0" onclick="openFatherArchive()" onkeydown="fatherKey(event)">
+            <h3>MR. MURRY</h3>
+            <p>Personal research and documents belonging to Dr. Murry.</p>
+        </div>
+    </div>
+
+    <div class="archive-next">
+        <a href="awrinkleintime-3.html" class="next-button">← Previous page</a>
+        <a href="awrinkleintime-5.html" class="next-button">Continue →</a>
+    </div>
+</div>
+</section>
+
+<div class="popup" id="photos" role="dialog" aria-modal="true" aria-labelledby="photosTitle" onclick="backdropClose(event,'photos')">
+    <div class="popup-box">
+        <button class="close-button" aria-label="Close photographs" onclick="closePopup('photos')">×</button>
+        <div class="popup-tag">ARCHIVE FOLDER</div>
+        <h2 id="photosTitle">Photographs</h2>
+        <p>A collection of photographs documenting families, communities, places and cultural events. Several photographs were removed from public archives after being classified as unnecessary or outdated.</p>
+    </div>
+</div>
+
+<div class="popup" id="music" role="dialog" aria-modal="true" aria-labelledby="musicTitle" onclick="backdropClose(event,'music')">
+    <div class="popup-box">
+        <button class="close-button" aria-label="Close music" onclick="closePopup('music')">×</button>
+        <div class="popup-tag">ARCHIVE FOLDER</div>
+        <h2 id="musicTitle">Music</h2>
+        <p>Catalogue for a collection of traditional songs recorded by community musicians before the recordings were removed from Mzanzi's music library by IT. The catalogue lists song titles, performers, and the communities they belong to.</p>
+    </div>
+</div>
+
+<div class="popup" id="history" role="dialog" aria-modal="true" aria-labelledby="historyTitle" onclick="backdropClose(event,'history')">
+    <div class="popup-box">
+        <button class="close-button" aria-label="Close history" onclick="closePopup('history')">×</button>
+        <div class="popup-tag">ARCHIVE FOLDER</div>
+        <h2 id="historyTitle">History</h2>
+        <p>Records of local events, community histories and historical accounts that became difficult to find through the Mzanzi Connect search system.</p>
+    </div>
+</div>
+
+<div class="popup" id="ancestry" role="dialog" aria-modal="true" aria-labelledby="ancestryTitle" onclick="backdropClose(event,'ancestry')">
+    <div class="popup-box">
+        <button class="close-button" aria-label="Close ancestry" onclick="closePopup('ancestry')">×</button>
+        <div class="popup-tag">ARCHIVE FOLDER</div>
+        <h2 id="ancestryTitle">Ancestry</h2>
+        <p>Family trees, oral histories and records showing connections between families and communities. Some records were removed because they could not be verified by the official system.</p>
+    </div>
+</div>
+
+<div class="popup" id="knowledge" role="dialog" aria-modal="true" aria-labelledby="knowledgeTitle" onclick="backdropClose(event,'knowledge')">
+    <div class="popup-box">
+        <button class="close-button" aria-label="Close knowledge" onclick="closePopup('knowledge')">×</button>
+        <div class="popup-tag">ARCHIVE FOLDER</div>
+        <h2 id="knowledgeTitle">Knowledge</h2>
+        <p>Notes and records of indigenous knowledge passed between generations. The archive contains information about plants, practices, local environments and community knowledge.</p>
+    </div>
+</div>
+
+<div class="popup" id="language" role="dialog" aria-modal="true" aria-labelledby="languageTitle" onclick="backdropClose(event,'language')">
+    <div class="popup-box">
+        <button class="close-button" aria-label="Close language" onclick="closePopup('language')">×</button>
+        <div class="popup-tag">ARCHIVE FOLDER</div>
+        <h2 id="languageTitle">Language</h2>
+        <p>Documents containing language records, translations, oral histories and educational material in African languages. Some of these materials became difficult to access through Mzanzi Connect.</p>
+    </div>
+</div>
+
+<div class="popup" id="fatherArchive" role="dialog" aria-modal="true" aria-label="Mr. Murry's recovered documents" onclick="backdropClose(event,'fatherArchive')">
+    <div class="slideshow-box">
+        <div class="slideshow-header">
+            <h2>MR. MURRY — RECOVERED DOCUMENTS</h2>
+            <div style="display:flex;align-items:center;">
+                <span class="slide-counter" id="slideCounter">1 / 4</span>
+                <button class="close-slide" aria-label="Close slideshow" onclick="closeFatherArchive()">×</button>
+            </div>
+        </div>
+
+        <div class="slide-image-area" onclick="nextSlide()">
+            <img id="fatherImage" src="research-paper.png" alt="Recovered document, slide 1">
+        </div>
+
+        <div class="slide-instruction">Click the document to continue.</div>
+    </div>
+</div>
+
+<script>
+let lastFocusedElement = null;
+
+function openPopup(id) {
+    const popup = document.getElementById(id);
+    lastFocusedElement = document.activeElement;
+    popup.classList.remove("show");
+    void popup.offsetWidth;
+    popup.classList.add("show");
+    document.body.style.overflow = "hidden";
+
+    const closeButton = popup.querySelector(".close-button, .close-slide");
+    if (closeButton) closeButton.focus();
+}
+
+function closePopup(id) {
+    document.getElementById(id).classList.remove("show");
+
+    if (!document.querySelector(".popup.show")) {
+        document.body.style.overflow = "";
+    }
+
+    if (lastFocusedElement) lastFocusedElement.focus();
+}
+
+function backdropClose(event, id) {
+    if (event.target === document.getElementById(id)) {
+        closePopup(id);
+    }
+}
+
+function folderKey(event, id) {
+    if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openPopup(id);
+    }
+}
+
+function fatherKey(event) {
+    if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openFatherArchive();
+    }
+}
+
+const fatherSlides = [
+    "research-paper.png",
+    "photograph-1.png",
+    "encrypted-file.png",
+    "meeting-transcript.png"
+];
+
+let currentSlide = 0;
+
+function openFatherArchive() {
+    currentSlide = 0;
+    updateSlide();
+    openPopup("fatherArchive");
+}
+
+function closeFatherArchive() {
+    closePopup("fatherArchive");
+}
+
+function nextSlide() {
+    if (currentSlide < fatherSlides.length - 1) {
+        currentSlide++;
+        updateSlide();
+    } else {
+        closeFatherArchive();
+        alert("You have reached the end of your father's recovered archive.");
+    }
+}
+
+function updateSlide() {
+    const image = document.getElementById("fatherImage");
+    image.src = fatherSlides[currentSlide];
+    image.alt = "Recovered document, slide " + (currentSlide + 1);
+
+    document.getElementById("slideCounter").textContent =
+        (currentSlide + 1) + " / " + fatherSlides.length;
+}
+
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") {
+        const popup = document.querySelector(".popup.show");
+        if (popup) closePopup(popup.id);
+    }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>The Drive</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #111;
+    color: #eee;
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+}
+
+/* ---------- DRIVE ACCESS ---------- */
+
+.drive-access {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 30px;
+}
+
+/* ---------- POP-UP BOX ---------- */
+
+.access-box {
+    width: 100%;
+    max-width: 550px;
+    border: 1px solid #555;
+    border-radius: 14px;
+    padding: 50px 35px;
+    background: #181818;
+    overflow: hidden;
+
+    /* Initial animation state */
+    opacity: 0;
+    transform: translateY(30px) scale(0.94);
+
+    animation: popup 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes popup {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.94);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translateY(-4px) scale(1.01);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ---------- TEXT ---------- */
+
+.small-label {
+    color: #888;
+    font-size: 11px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+.access-box h1 {
+    font-size: 38px;
+    font-weight: 500;
+    margin: 0 0 15px;
+}
+
+.access-box p {
+    color: #aaa;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+/* ---------- WARNING ---------- */
+
+.warning {
+    border: 1px solid #444;
+    padding: 15px;
+    margin: 25px 0;
+    font-size: 12px;
+    color: #aaa;
+    text-align: left;
+}
+
+/* ---------- BUTTON ---------- */
+
+.access-button {
+    display: inline-block;
+    padding: 13px 30px;
+    background: #eee;
+    color: #111;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.access-button:hover {
+    background: #ccc;
+}
+
+.access-button:active {
+    transform: scale(0.97);
+}
+
+/* ---------- STATUS ---------- */
+
+.status {
+    margin-top: 25px;
+    color: #666;
+    font-size: 11px;
+}
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 600px) {
+    .drive-access {
+        padding: 20px;
+    }
+
+    .access-box {
+        padding: 40px 22px;
+        border-radius: 12px;
+    }
+
+    .access-box h1 {
+        font-size: 32px;
+    }
+}
+
+/* ---------- REDUCED MOTION ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+    .access-box {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="drive-access">
+
+    <div class="access-box">
+
+        <div class="small-label">
+            RECOVERED DIGITAL ARCHIVE
+        </div>
+
+        <h1>THE DRIVE</h1>
+
+        <p>
+            You have received a restricted archive.
+        </p>
+
+        <div class="warning">
+
+            FILE STATUS: ENCRYPTED<br>
+            SOURCE: UNKNOWN<br>
+            ACCESS LEVEL: RESTRICTED<br><br>
+
+            This archive was not created through
+            Mzanzi Connect.
+
+        </div>
+
+        <p>
+            Some files may have been removed or damaged.
+            Continue only if you are prepared to see what
+            has been hidden.
+        </p>
+
+        <a href="awrinkleintime-4.html" class="access-button">
+            ACCESS DRIVE
+        </a>
+
+        <div class="status">
+            Connection established · Archive waiting
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

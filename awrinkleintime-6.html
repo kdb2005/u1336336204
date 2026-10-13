@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>A Wrinkle in Time - Messages</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+    background: #CFC1B7;
+    color: #25282b;
+}
+
+/* SECTION 3 - CHAT */
+.chat-section {
+    min-height: 100vh;
+    padding: 60px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: filter 0.3s ease;
+}
+
+/* BLUR BACKGROUND WHEN POPUP IS OPEN */
+.chat-section.blurred {
+    filter: blur(5px);
+    pointer-events: none;
+    user-select: none;
+}
+
+.chat-container {
+    width: 100%;
+    max-width: 650px;
+    background: white;
+    border: 1px solid #d5d5d5;
+    border-radius: 14px;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: box-shadow 0.25s ease;
+}
+
+.chat-container:hover {
+    box-shadow: 0 6px 18px rgba(37, 40, 43, 0.12);
+}
+
+.chat-header {
+    padding: 18px;
+    border-bottom: 1px solid #ddd;
+    background: white;
+}
+
+.chat-header strong {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.chat-header small {
+    display: block;
+    color: #777;
+    margin-top: 4px;
+    font-size: 12px;
+}
+
+/* CHAT MESSAGES */
+.chat-messages {
+    padding: 25px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* MESSAGE BUBBLES WITHOUT SENDER LABELS */
+.message {
+    max-width: 75%;
+    width: fit-content;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    animation: messageEnter 0.25s ease both;
+}
+
+/* MA WHATSIT'S MESSAGES */
+.w {
+    background: #e5e5ea;
+    color: #25282b;
+    margin-right: auto;
+    border-bottom-left-radius: 5px;
+}
+
+/* MEG'S MESSAGES */
+.meg {
+    background: #007aff;
+    color: #ffffff;
+    margin-left: auto;
+    border-bottom-right-radius: 5px;
+}
+
+/* CHAT CONTROLS */
+.chat-controls {
+    padding: 15px;
+    border-top: 1px solid #ddd;
+    text-align: center;
+    background: white;
+}
+
+.chat-button {
+    border: none;
+    background: #25282b;
+    color: white;
+    padding: 12px 25px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    transition: background 0.2s ease;
+}
+
+.chat-button:hover:not(:disabled) {
+    background: #444;
+}
+
+.chat-button:active:not(:disabled) {
+    background: #111;
+}
+
+.chat-button:disabled {
+    background: #aaa;
+    cursor: default;
+}
+
+.chat-note {
+    font-size: 11px;
+    color: #777;
+    margin-top: 8px;
+}
+
+/* ARCHIVE POPUP */
+.popup-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    padding: 20px;
+    background: rgba(25, 23, 22, 0.35);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-overlay.show {
+    display: flex;
+    animation: overlayEnter 0.3s ease both;
+}
+
+.popup {
+    width: 100%;
+    max-width: 420px;
+    padding: 32px;
+    background: #fff;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+    animation: popupEnter 0.4s ease both;
+}
+
+.popup h2 {
+    margin: 0 0 12px;
+    font-size: 21px;
+    font-weight: 600;
+}
+
+.popup p {
+    margin: 0 0 24px;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.archive-link {
+    display: block;
+    width: 100%;
+    padding: 13px 18px;
+    border-radius: 5px;
+    background: #809C66;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.archive-link:hover {
+    background: #6f8958;
+}
+
+.close-popup {
+    margin-top: 15px;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: #777;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.close-popup:hover {
+    color: #25282b;
+}
+
+/* MESSAGE ANIMATION */
+@keyframes messageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* POPUP ANIMATION */
+@keyframes overlayEnter {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes popupEnter {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 500px) {
+    .chat-section {
+        padding: 25px 14px;
+    }
+
+    .chat-container {
+        min-height: 600px;
+        border-radius: 12px;
+    }
+
+    .chat-messages {
+        padding: 20px 15px;
+    }
+
+    .message {
+        max-width: 85%;
+    }
+
+    .popup {
+        padding: 26px 22px;
+    }
+}
+
+/* ACCESSIBILITY */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SECTION 3 - CHAT WITH MA WHATSIT -->
+<section class="chat-section" id="chat">
+    <div class="chat-container">
+
+        <div class="chat-header">
+            <strong>Ma Whatsit</strong>
+            <small>Encrypted connection</small>
+        </div>
+
+        <div class="chat-messages" id="chatMessages"></div>
+
+        <div class="chat-controls">
+            <button
+                class="chat-button"
+                id="chatButton"
+                onclick="nextChatMessage()">
+                Next message
+            </button>
+
+            <div class="chat-note" id="chatNote">
+                Press next message to continue.
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- POPUP LINKING TO MR. MURRY'S ARCHIVE -->
+<div
+    class="popup-overlay"
+    id="archivePopup"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="popupTitle"
+    aria-describedby="popupDescription">
+
+    <div class="popup">
+
+        <h2 id="popupTitle">Your next step</h2>
+
+        <p id="popupDescription">
+            Ma Whatsit has given you a place to start.
+            Return to your father's archive and find the
+            document containing the phone number.
+        </p>
+
+        <a class="archive-link" href="awrinkleintime-7.html">
+            Open Mr Murry's Archive
+        </a>
+
+        <button
+            class="close-popup"
+            type="button"
+            onclick="closeArchivePopup()">
+            Stay in messages
+        </button>
+
+    </div>
+</div>
+
+<script>
+/* MA WHATSIT CHAT */
+const chatMessages = [
+    {
+        type: "meg",
+        text: "I found my dad's documents. I know what IT did to him."
+    },
+    {
+        type: "w",
+        text: "Then you know why they wanted his work."
+    },
+    {
+        type: "meg",
+        text: "How do I save him?"
+    },
+    {
+        type: "w",
+        text: "You do not save him by becoming stronger than everyone around you."
+    },
+    {
+        type: "w",
+        text: "You save him by becoming stronger than IT."
+    },
+    {
+        type: "meg",
+        text: "How???"
+    },
+    {
+        type: "w",
+        text: "They separated him from the people, memories and history that gave his life meaning."
+    },
+    {
+        type: "w",
+        text: "You need to reconnect him to those things."
+    },
+    {
+        type: "meg",
+        text: "But I still don't know where he is"
+    },
+    {
+        type: "w",
+        text: "Go back to his archive."
+    },
+    {
+        type: "w",
+        text: "One of the documents contains a phone number."
+    },
+    {
+        type: "w",
+        text: "Call him."
+    },
+    {
+        type: "meg",
+        text: "Okay... and then?"
+    },
+    {
+        type: "w",
+        text: "Remind him who he is."
+    }
+];
+
+let chatIndex = 0;
+
+function nextChatMessage() {
+    if (chatIndex >= chatMessages.length) {
+        return;
+    }
+
+    const data = chatMessages[chatIndex];
+    const message = document.createElement("div");
+
+    message.className = "message " + data.type;
+    message.textContent = data.text;
+
+    document.getElementById("chatMessages").appendChild(message);
+
+    chatIndex++;
+
+    if (chatIndex >= chatMessages.length) {
+        document.getElementById("chatButton").disabled = true;
+
+        document.getElementById("chatNote").textContent =
+            "The number is waiting in your father's archive.";
+
+        // Blur the chat background and show the archive popup.
+        document.getElementById("chat").classList.add("blurred");
+        document.getElementById("archivePopup").classList.add("show");
+
+        document.querySelector(".close-popup").focus();
+    }
+}
+
+/* CLOSE THE ARCHIVE POPUP */
+function closeArchivePopup() {
+    document.getElementById("archivePopup").classList.remove("show");
+    document.getElementById("chat").classList.remove("blurred");
+}
+
+/* CLOSE THE POPUP WITH THE ESCAPE KEY */
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") {
+        closeArchivePopup();
+    }
+});
+</script>
+
+</body>
+</html>

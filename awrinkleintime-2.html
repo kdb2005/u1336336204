@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Messages - Mzanzi Connect</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+    background: #CFC1B7;
+    color: #25282b;
+}
+
+/* ---------- MESSAGES PAGE ---------- */
+
+.page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    transition: filter 0.3s ease;
+}
+
+.page.blurred {
+    filter: blur(5px);
+    pointer-events: none;
+    user-select: none;
+}
+
+.chat-container {
+    width: 100%;
+    max-width: 650px;
+    background: white;
+    border: 1px solid #d8d8d8;
+    border-radius: 14px;
+    min-height: 650px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: box-shadow 0.25s ease;
+}
+
+.chat-container:hover {
+    box-shadow: 0 6px 18px rgba(37, 40, 43, 0.12);
+}
+
+.chat-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+}
+
+.profile {
+    width: 42px;
+    height: 42px;
+    background: #ddd;
+    border-radius: 50%;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.chat-header strong {
+    font-size: 15px;
+}
+
+.chat-header small {
+    display: block;
+    color: #777;
+    margin-top: 3px;
+}
+
+.messages {
+    padding: 25px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ---------- MESSAGE ANIMATION ---------- */
+
+.message {
+    max-width: 75%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-wrap: break-word;
+    opacity: 0;
+    animation: messageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.w-message {
+    background: #e5e5ea;
+    color: #25282b;
+    margin-right: auto;
+    border-bottom-left-radius: 5px;
+}
+
+.meg-message {
+    background: #007aff;
+    color: #ffffff;
+    margin-left: auto;
+    border-bottom-right-radius: 5px;
+}
+
+@keyframes messageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---------- DRIVE FILE ---------- */
+
+.drive-file {
+    display: none;
+    text-decoration: none;
+    color: #25282b;
+    border: 1px solid #ccc;
+    background: #f5f5f5;
+    padding: 15px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+    opacity: 0;
+    animation: messageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.drive-file:hover {
+    background: #e8e8e8;
+}
+
+.drive-file-content {
+    display: flex;
+    align-items: center;
+}
+
+.drive-icon {
+    font-size: 28px;
+    margin-right: 12px;
+}
+
+.drive-file small {
+    display: block;
+    color: #777;
+    margin-top: 3px;
+}
+
+/* ---------- CHAT CONTROLS ---------- */
+
+.controls {
+    border-top: 1px solid #ddd;
+    padding: 15px;
+    text-align: center;
+}
+
+.next-button {
+    border: none;
+    background: #25282b;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s ease;
+}
+
+.next-button:hover:not(:disabled) {
+    background: #444;
+}
+
+.next-button:disabled {
+    background: #aaa;
+    cursor: default;
+}
+
+.instruction {
+    text-align: center;
+    color: #777;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+/* ---------- THE DRIVE POPUP ---------- */
+
+.popup-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.45);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.popup-overlay.show {
+    display: flex;
+    animation: overlayEnter 0.3s ease both;
+}
+
+.access-box {
+    width: 100%;
+    max-width: 550px;
+    border: 1px solid #555;
+    border-radius: 14px;
+    padding: 45px 35px;
+    background: #181818;
+    color: #eee;
+    text-align: center;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(30px) scale(0.94);
+    animation: popupEnter 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.small-label {
+    color: #888;
+    font-size: 11px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+.access-box h1 {
+    font-size: 38px;
+    font-weight: 500;
+    margin: 0 0 15px;
+}
+
+.access-box p {
+    color: #aaa;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.warning {
+    border: 1px solid #444;
+    padding: 15px;
+    margin: 25px 0;
+    font-size: 12px;
+    color: #aaa;
+    text-align: left;
+    line-height: 1.6;
+}
+
+.access-button {
+    display: inline-block;
+    padding: 13px 30px;
+    background: #eee;
+    color: #111;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.access-button:hover {
+    background: #ccc;
+}
+
+.access-button:active {
+    transform: scale(0.97);
+}
+
+.status {
+    margin-top: 25px;
+    color: #666;
+    font-size: 11px;
+}
+
+/* ---------- POPUP ANIMATIONS ---------- */
+
+@keyframes overlayEnter {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes popupEnter {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.94);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translateY(-4px) scale(1.01);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 600px) {
+    .page {
+        padding: 20px 12px;
+    }
+
+    .chat-container {
+        min-height: 650px;
+        border-radius: 12px;
+    }
+
+    .messages {
+        padding: 20px 15px;
+    }
+
+    .message {
+        max-width: 85%;
+    }
+
+    .access-box {
+        padding: 40px 22px;
+        border-radius: 12px;
+    }
+
+    .access-box h1 {
+        font-size: 32px;
+    }
+}
+
+/* ---------- REDUCED MOTION ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- MESSAGES PAGE -->
+<div class="page" id="messagesPage">
+
+    <div class="chat-container">
+
+        <div class="chat-header">
+
+            <div class="profile"></div>
+
+            <div>
+                <strong>Unknown Contact</strong>
+                <small>Ma W</small>
+            </div>
+
+        </div>
+
+        <div class="messages" id="messages"></div>
+
+        <div class="controls">
+
+            <button
+                class="next-button"
+                id="nextButton"
+                onclick="nextMessage()">
+                Next message
+            </button>
+
+            <div class="instruction" id="instruction">
+                Press next message to continue.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- THE DRIVE ACCESS POPUP -->
+<div
+    class="popup-overlay"
+    id="drivePopup"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="driveTitle"
+    aria-describedby="driveDescription">
+
+    <div class="access-box">
+
+        <div class="small-label">
+            RECOVERED DIGITAL ARCHIVE
+        </div>
+
+        <h1 id="driveTitle">THE DRIVE</h1>
+
+        <p id="driveDescription">
+            You have received a restricted archive.
+        </p>
+
+        <div class="warning">
+            FILE STATUS: ENCRYPTED<br>
+            SOURCE: UNKNOWN<br>
+            ACCESS LEVEL: RESTRICTED<br><br>
+
+            This archive was not created through
+            Mzanzi Connect.
+        </div>
+
+        <p>
+            Some files may have been removed or damaged.
+            Continue only if you are prepared to see what
+            has been hidden.
+        </p>
+
+        <a href="awrinkleintime-4.html" class="access-button">
+            ACCESS DRIVE
+        </a>
+
+        <div class="status">
+            Connection established · Archive waiting
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+/* ---------- CHAT MESSAGES ---------- */
+
+const messages = [
+    {
+        sender: "Ma W",
+        type: "w-message",
+        text: "Meg?"
+    },
+    {
+        sender: "Meg",
+        type: "meg-message",
+        text: "Who is this?"
+    },
+    {
+        sender: "Ma W",
+        type: "w-message",
+        text: "Someone who knows what happened to your father."
+    },
+    {
+        sender: "Ma W",
+        type: "w-message",
+        text: "I know where he is."
+    },
+    {
+        sender: "Meg",
+        type: "meg-message",
+        text: "What??? How do you know my dad?"
+    },
+    {
+        sender: "Meg",
+        type: "meg-message",
+        text: "Where is he??"
+    },
+    {
+        sender: "Ma W",
+        type: "w-message",
+        text: "I can't explain everything here."
+    },
+    {
+        sender: "Ma W",
+        type: "w-message",
+        text: "This should tell you everything."
+    }
+];
+
+let currentMessage = 0;
+
+function nextMessage() {
+    if (currentMessage >= messages.length) {
+        return;
+    }
+
+    const messageData = messages[currentMessage];
+    const message = document.createElement("div");
+
+    message.className = "message " + messageData.type;
+    message.textContent = messageData.text;
+
+    document.getElementById("messages").appendChild(message);
+
+    currentMessage++;
+
+    if (currentMessage === messages.length) {
+        showDrive();
+
+        document.getElementById("nextButton").disabled = true;
+
+        document.getElementById("instruction").textContent =
+            "Ma W has sent you a file. Click it to continue.";
+    }
+}
+
+/* ---------- SHOW THE DRIVE FILE ---------- */
+
+function showDrive() {
+    const file = document.createElement("a");
+
+    file.href = "#";
+    file.className = "drive-file";
+    file.style.display = "block";
+
+    file.innerHTML = `
+        <div class="drive-file-content">
+            <div class="drive-icon">📁</div>
+
+            <div>
+                <strong>THE_DRIVE</strong>
+                <small>Encrypted archive · 1 file</small>
+            </div>
+        </div>
+    `;
+
+    file.addEventListener("click", function(event) {
+        event.preventDefault();
+        openDrivePopup();
+    });
+
+    document.getElementById("messages").appendChild(file);
+}
+
+/* ---------- OPEN THE DRIVE POPUP ---------- */
+
+function openDrivePopup() {
+    document.getElementById("messagesPage").classList.add("blurred");
+    document.getElementById("drivePopup").classList.add("show");
+
+    document.querySelector(".access-button").focus();
+}
+
+/* ---------- CLOSE POPUP WITH ESCAPE ---------- */
+
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") {
+        document.getElementById("drivePopup").classList.remove("show");
+        document.getElementById("messagesPage").classList.remove("blurred");
+    }
+});
+</script>
+
+</body>
+</html>
